@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <title>Gerenciador de Tarefas</title>
+    <style>
+       body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            font-size: medium;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            font-size: medium;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        h2 {
+            color: #4572c7;
+            font-size: medium;
+
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .task button {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .task.completed {
+            background-color: #d1f5d3;
+            border-color: #4cae4c;
+        }
+
+        .summary {
+            text-align: start;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: 1px solid #484a4e;
+            max-width: 200px;
+            background-color: #4798ee;
+        
+        }
+
+        .summary p {
+            margin: 5px ;
+        }
+
+        .add-task {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .add-task input[type="text"] {
+            width: 70%;
+            padding: 5px;
+            border: 1px solid #459fe9;
+            border-radius: 3px;
+        }
+
+        .add-task button {
+            background-color: #4798ee;
+            color: #fff;
+            border: none;
+            padding: 5px 15px;
+            cursor: pointer;
+        }
+        .add-task{
+            background-color: #459fe9;
+        }
+    
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="home.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="add.html">Calcular Dispesas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="contato.html">Contato</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" aria-disabled="true"></a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Gerenciador de Tarefas</h1>
+        <h2>Tarefas Pendentes</h2>
+        <ul class="task-list" id="pendingTasks">
+        </ul>
+        <h2>Tarefas Concluídas</h2>
+        <ul class="task-list" id="completedTasks">    
+        </ul>
+        <div class="summary">
+            <p>Total de Tarefas: <span id="totalTasks">0</span></p>
+            <p>Tarefas Concluídas: <span id="completedCount">0</span></p>
+            <p>Tarefas Pendentes: <span id="pendingCount">0</span></p>
+        </div>
+        <br>
+        <div>
+            <h2>Adicionar Nova Tarefa</h2>
+            <input type="text" id="newTaskText" placeholder="Descrição da Tarefa">
+            <button onclick="addTask()">Adicionar Tarefa</button>
+        </div>
+    </div>
+
+    <script>
+        var tasks = [
+            { text: 'Fazer compras', completed: false },
+            { text: 'Ler um livro', completed: true },
+            { text: 'Trabalhar em projeto', completed: false }
+        ];
+
+        function updateTaskLists() {
+            var pendingTasksList = document.getElementById("pendingTasks");
+            var completedTasksList = document.getElementById("completedTasks");
+            var totalTasks = document.getElementById("totalTasks");
+            var completedCount = document.getElementById("completedCount");
+            var pendingCount = document.getElementById("pendingCount");
+
+            pendingTasksList.innerHTML = "";
+            completedTasksList.innerHTML = "";
+
+            var pending = 0;
+            var completed = 0;
+
+            tasks.forEach(function(task, index) {
+                var taskItem = document.createElement("li");
+                taskItem.className = "task" + (task.completed ? " completed" : "");
+
+                var taskText = document.createElement("span");
+                taskText.textContent = task.text;
+
+                var removeButton = document.createElement("button");
+                removeButton.textContent = "Remover";
+                removeButton.onclick = function() {
+                    removeTask(index);
+                };
+
+                taskItem.appendChild(taskText);
+                taskItem.appendChild(removeButton);
+
+                if (task.completed) {
+                    completedTasksList.appendChild(taskItem);
+                    completed++;
+                } else {
+                    pendingTasksList.appendChild(taskItem);
+                    pending++;
+                }
+            });
+
+            totalTasks.textContent = tasks.length;
+            completedCount.textContent = completed;
+            pendingCount.textContent = pending;
+        }
+
+        function addTask() {
+            var newTaskText = document.getElementById("newTaskText").value;
+            if (newTaskText) {
+                tasks.push({ text: newTaskText, completed: false });
+                updateTaskLists();
+                document.getElementById("newTaskText").value = "";
+            }
+        }
+
+        function removeTask(index) {
+            if (index >= 0 && index < tasks.length) {
+                tasks.splice(index, 1);
+                updateTaskLists();
+            }
+        }
+
+        updateTaskLists();
+    </script>
+</body>
+</html>
